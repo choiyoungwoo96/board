@@ -1,31 +1,53 @@
 "use client";
 
 import axios from "axios";
-import { headers } from "next/headers";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [inputValue, setInputValue] = useState([
-    {
-      title: "",
-      content: "",
-    },
-  ]);
+  const [inputValue, setInputValue] = useState({
+    title: "",
+    content: "",
+  });
+  const [board, setBoard] = useState([]);
+
+  const onChange = (e) => {
+    setInputValue((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const getResult = async () => {
+    try {
+      const getResult = await axios.get("/api/board");
+      setBoard((prev) => {
+        console.log("최신업데이트 : ", getResult.data);
+        return getResult.data;
+      });
+    } catch (error) {
+      console.error("error :", error);
+    }
+  };
+
+  //글 생성
   const onSubmit = async (e) => {
     e.preventDefault();
-    const result = await axios.post("/api/board", inputValue, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const createResult = await axios.post("/api/board", inputValue, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(createResult);
+    } catch (error) {
+      console.error("error :", error);
+    }
+    getResult();
   };
-  const onChange = (e) => {
-    setInputValue({
-      ...inputValue,
-      [e.target.name]: e.target.value,
-    });
-    console.log(inputValue);
-  };
+  //글 목록 가지고오기
+  useEffect(() => {
+    getResult();
+  }, []);
+
   return (
     <div className="w-screen h-screen bg-blue-500 flex items-center justify-center">
       <div className="flex flex-col gap-4 w-full max-w-screen-xl h-[700px] bg-white m-auto p-8">
@@ -58,8 +80,8 @@ export default function Home() {
                 className="w-full px-2 py-1 border border-blue-500 rounded-lg"
                 placeholder="내용을 입력하세요"
                 required
-                onChange={onChange}
                 name="content"
+                onChange={onChange}
               ></textarea>
             </div>
             <button className="p-4 w-full bg-blue-500 rounded-lg text-white">
@@ -79,13 +101,15 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody className="bg-white border">
-                <tr>
-                  <td className="px-4 py-2">1</td>
-                  <td className="px-4 py-2">제목</td>
-                  <td className="px-4 py-2">오늘의 글은?</td>
-                  <td className="px-4 py-2"> 2024.03.24</td>
-                  <td className="px-4 py-2">최영우</td>
-                </tr>
+                {board.map((boardItem, index) => (
+                  <tr key={index}>
+                    <td className="px-4 py-2">{boardItem.id}</td>
+                    <td className="px-4 py-2">{boardItem.title}</td>
+                    <td className="px-4 py-2">{boardItem.content}</td>
+                    <td className="px-4 py-2"> {boardItem.create_at}</td>
+                    <td className="px-4 py-2">{boardItem.userid}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

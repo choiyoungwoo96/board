@@ -4,7 +4,7 @@ const pool = mariadb.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.BD_NAME,
+  database: process.env.DB_NAME,
   connectionLimit: 5,
 });
 
@@ -16,12 +16,13 @@ export async function dbQuery(req, params) {
     const result = await dbConnection.query(req, params);
     return result;
   } catch (error) {
-    return console.error("DBERROR", error);
+    console.error("DBERROR", error);
     throw error;
   } finally {
-    if (dbConnection) dbConnection.release();
+    if (dbConnection) {
+      console.log("DB 연결 해제");
+      dbConnection.release();
+    }
   }
 }
-module.exports = {
-  dbQuery,
-};
+export default dbQuery;

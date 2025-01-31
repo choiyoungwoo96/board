@@ -1,27 +1,48 @@
 import { dbQuery } from "@/lib/db";
-import axios from "axios";
-import { headers } from "next/headers";
-
-export async function GET() {}
-export async function POST(req) {
-  const { title, content } = req.body;
+function bigIntReplacer(key, value) {
+  return typeof value === "bigint" ? value.toString() : value;
+}
+export async function GET() {
   try {
-    // const createResult = dbQuery(
-    //   "insert into board (title,content,userid) values(?,?,?)",
-    //   [title, content]
-    // );
-    return new Response(
-      JSON.stringify({
-        title,
-        content,
-        userid: "choi",
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-    );
+    const result = await dbQuery("SELECT * FROM board", []);
+    return new Response(JSON.stringify(result, bigIntReplacer), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   } catch (error) {
-    console.error("error : ", error);
+    return new Response(JSON.stringify({ message: "서버 오류" }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+}
+
+export async function POST(request) {
+  const body = await request.json();
+  const { title, content } = body;
+  try {
+    const createResult = await dbQuery(
+      "INSERT INTO board (title,content,userid) values(?,?,?)",
+      [title, content, "choi"]
+    );
+    console.log(createResult);
+    return new Response(JSON.stringify({ createResult }, bigIntReplacer), {
+      status: 201,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error("❌ POST 요청 오류:", error);
+    return new Response(JSON.stringify({ message: "서버 오류 발생" }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 }
