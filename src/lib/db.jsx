@@ -12,7 +12,6 @@ export async function dbQuery(req, params) {
   let dbConnection;
   try {
     dbConnection = await pool.getConnection();
-    console.log("데이터베이스 연결 성공");
     const result = await dbConnection.query(req, params);
     return result;
   } catch (error) {
@@ -20,9 +19,7 @@ export async function dbQuery(req, params) {
     throw error;
   } finally {
     if (dbConnection) {
-      console.log("DB 연결 해제");
       dbConnection.release();
     }
   }
 }
-export default dbQuery;

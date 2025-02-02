@@ -1,5 +1,6 @@
-import { dbQuery } from "@/lib/db";
+import { dbQuery } from "../../../lib/db";
 function bigIntReplacer(key, value) {
+  console.log("key : ", key, "value : ", value);
   return typeof value === "bigint" ? value.toString() : value;
 }
 export async function GET() {
@@ -29,8 +30,8 @@ export async function POST(request) {
       "INSERT INTO board (title,content,userid) values(?,?,?)",
       [title, content, "choi"]
     );
-    console.log(createResult);
-    return new Response(JSON.stringify({ createResult }, bigIntReplacer), {
+
+    return new Response(JSON.stringify(createResult, bigIntReplacer), {
       status: 201,
       headers: {
         "Content-Type": "application/json",

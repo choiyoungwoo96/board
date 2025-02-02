@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function Home() {
@@ -24,7 +25,7 @@ export default function Home() {
         return getResult.data;
       });
     } catch (error) {
-      console.error("error :", error);
+      console.error(error);
     }
   };
 
@@ -49,8 +50,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-screen h-screen bg-blue-500 flex items-center justify-center">
-      <div className="flex flex-col gap-4 w-full max-w-screen-xl h-[700px] bg-white m-auto p-8">
+    <div className="w-screen h-full bg-blue-500 flex items-center justify-center p-8">
+      <div className="flex flex-col gap-4 w-full max-w-screen-xl h-full bg-white m-auto p-8">
         <div className="flex items-center justify-end gap-4 text-white">
           <button className="bg-blue-500 px-4 py-1 rounded-lg">로그인</button>
           <button className="bg-blue-500 px-4 py-1 rounded-lg">내정보</button>
@@ -89,7 +90,7 @@ export default function Home() {
             </button>
           </form>
 
-          <div className="flex items-start justify-start">
+          <div className="flex flex-col items-start justify-start">
             <table className="bg-blue-500 w-full rounded-lg text-center">
               <thead className="text-white">
                 <tr>
@@ -103,15 +104,42 @@ export default function Home() {
               <tbody className="bg-white border">
                 {board.map((boardItem, index) => (
                   <tr key={index}>
-                    <td className="px-4 py-2">{boardItem.id}</td>
-                    <td className="px-4 py-2">{boardItem.title}</td>
-                    <td className="px-4 py-2">{boardItem.content}</td>
-                    <td className="px-4 py-2"> {boardItem.create_at}</td>
-                    <td className="px-4 py-2">{boardItem.userid}</td>
+                    <td className="px-4 py-2">
+                      <Link href={`/board/${boardItem.id}`}>
+                        {boardItem.id}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2">
+                      <Link href={`/board/${boardItem.id}`}>
+                        {boardItem.title}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2">
+                      <Link href={`/board/${boardItem.id}`}>
+                        {boardItem.content}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2">
+                      <Link href={`/board/${boardItem.id}`}>
+                        {boardItem.create_at.split("T")[0]}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2">
+                      <Link href={`/board/${boardItem.id}`}>
+                        {boardItem.userid}
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            <div className="w-full flex items-center justify-center gap-4 m-4">
+              <button>prev</button>
+              <button className="w-[40px] h-[40px] rounded-full text-white bg-blue-500 flex items-center justify-center">
+                1
+              </button>
+              <button>next</button>
+            </div>
           </div>
         </div>
       </div>
